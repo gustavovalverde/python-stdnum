@@ -73,12 +73,10 @@ _ncf_document_types = (
     '03',  # debit note
     '04',  # credit note (refunds)
     '11',  # informal supplier invoices (purchases)
-    '12',  # single income invoices
+    '12',  # single income record
     '13',  # minor expenses invoices (purchases)
     '14',  # invoices for special customers (tourists, free zones)
     '15',  # invoices for the government
-    '16',  # invoices for export
-    '17',  # invoices for payments abroad
 )
 
 _ecf_document_types = (
@@ -168,7 +166,7 @@ def check_dgii(rnc, ncf, timeout=30):  # pragma: no cover
     from stdnum.do.rnc import compact as rnc_compact
     rnc = rnc_compact(rnc)
     ncf = compact(ncf)
-    url = 'https://www.dgii.gov.do/app/WebApps/ConsultasWeb/consultas/ncf.aspx'
+    url = 'https://dgii.gov.do/app/WebApps/ConsultasWeb2/ConsultasWeb/consultas/ncf.aspx'
     headers = {
         'User-Agent': 'Mozilla/5.0 (python-stdnum)',
     }
@@ -187,10 +185,10 @@ def check_dgii(rnc, ncf, timeout=30):  # pragma: no cover
     # Do the actual request
     document = lxml.html.fromstring(
         requests.post(url, headers=headers, data=data, timeout=timeout).text)
-    result = document.find('.//div[@id="ctl00_cphMain_pResultado"]')
+    result = document.find('.//div[@id="cphMain_pResultado"]')
     if result is not None:
         data = {
-            'validation_message': document.findtext('.//*[@id="ctl00_cphMain_lblInformacion"]').strip(),
+            'validation_message': document.findtext('.//*[@id="cphMain_lblInformacion"]').strip(),
         }
         data.update(zip(
             [x.text.strip().rstrip(':') for x in result.findall('.//strong')],
